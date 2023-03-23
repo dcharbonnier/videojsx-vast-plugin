@@ -29,7 +29,7 @@ const DEFAULT_OPTIONS = Object.freeze({
 /**
  * VastPlugin
  */
-export class VastPlugin extends Plugin {
+class VastPlugin extends Plugin {
 
   /**
    * Constructor
@@ -342,3 +342,4 @@ export class VastPlugin extends Plugin {
 }
 
 videojs.registerPlugin('vast', VastPlugin);
+export default VastPlugin;
