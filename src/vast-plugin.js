@@ -29,7 +29,7 @@ const DEFAULT_OPTIONS = Object.freeze({
 /**
  * VastPlugin
  */
-class VastPlugin extends Plugin {
+export class VastPlugin extends Plugin {
 
   /**
    * Constructor
