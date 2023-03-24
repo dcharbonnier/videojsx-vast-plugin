@@ -3,6 +3,7 @@ import window from 'global/window';
 import document from 'global/document';
 import {once} from './utils';
 import {createVASTContext} from "./event";
+import videojs from 'video.js';
 
 const VALID_TYPES = ['application/x-javascript', 'text/javascript', 'application/javascript'];
 
