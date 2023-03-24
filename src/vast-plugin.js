@@ -342,3 +342,18 @@ export class VastPlugin extends Plugin {
 }
 
 videojs.registerPlugin('vast', VastPlugin);
+
+/**
+  * @param {CustomVideoJsPlayer} player
+  * @param {Record<string, any>} options
+ */
+const onPlayerReady = (player, options) => {
+  player.vast = new VastPlugin(player, options);
+};
+
+/**
+ * @param {Record<string, any>} options
+ */
+export const vastPlugin = function (options) {
+  onPlayerReady(this, options);
+};
