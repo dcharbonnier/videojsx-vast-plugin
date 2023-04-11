@@ -14,6 +14,8 @@ const DEFAULT_OPTIONS = Object.freeze({
   wrapperLimit: 10,
   withCredentials: true,
   skip: 0,
+  skipLabel: 'Skip',
+  skipCountDownLabel: 'Skip in {time_left}...',
   vpaid: {
     containerId: undefined,
     containerClass: 'vjs-vpaid-container',

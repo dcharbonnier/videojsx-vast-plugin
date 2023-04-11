@@ -97,13 +97,15 @@ export class UI extends videojs.EventTarget {
   }
 
   #onTimeUpdate = () => {
+    const skipLabel = this.options.skipLabel;
+    const skipCountDownLabel = this.options.skipCountDownLabel;
     this.player.loadingSpinner.el().style.display = 'none';
 
     const timeLeft = Math.ceil(this.options.skip - this.player.currentTime());
 
     if (timeLeft > 0) {
       disableSkip(this.skipButtonElement);
-      this.skipButtonElement.innerHTML = 'Skip in ' + timeLeft + '...';
+      this.skipButtonElement.innerHTML = skipCountDownLabel.replace(/\{time_left\}/g, timeleft);
     } else {
       enableSkip(this.skipButtonElement);
       this.skipButtonElement.innerHTML = 'Skip';
