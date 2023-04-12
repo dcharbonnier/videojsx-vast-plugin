@@ -105,10 +105,10 @@ export class UI extends videojs.EventTarget {
 
     if (timeLeft > 0) {
       disableSkip(this.skipButtonElement);
-      this.skipButtonElement.innerHTML = skipCountDownLabel.replace(/\{time_left\}/g, timeleft);
+      this.skipButtonElement.innerHTML = skipCountDownLabel.replace(/\{time_left\}/g, timeLeft);
     } else {
       enableSkip(this.skipButtonElement);
-      this.skipButtonElement.innerHTML = 'Skip';
+      this.skipButtonElement.innerHTML = skipLabel;
     }
   }
 }
