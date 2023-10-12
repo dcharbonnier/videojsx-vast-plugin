@@ -16,9 +16,20 @@ export function once(fn, context = null) {
 }
 
 export function linearFn(creative) {
-  return creative.type === 'linear' && creative.mediaFiles.length;
+  return creative.type === "linear" && creative.mediaFiles.length;
 }
 
 export function companionFn(creative) {
-  return creative.type === 'companion';
+  return creative.type === "companion";
+}
+
+/**
+ *
+ * @param {XMLDocument|string} xml
+ */
+export function isVmap(xml) {
+  if (xml.includes("<vmap:VMAP")) {
+    return true;
+  }
+  return false;
 }

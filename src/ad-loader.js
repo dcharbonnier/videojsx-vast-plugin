@@ -1,5 +1,5 @@
 import window from "global";
-import { companionFn, linearFn } from "./utils";
+import { companionFn, linearFn, isVmap } from "./utils";
 import { VASTClient, VASTParser, VASTTracker } from "@dailymotion/vast-client";
 import { TrackedAd } from "./tracked-ad";
 
@@ -41,7 +41,21 @@ export class AdLoader {
    * @param {XMLDocument|string} xml
    */
   loadAdsWithXml(xml) {
-    return this.loadAdsWithVASTXml(xml);
+    if (isVmap(xml)) {
+      console.log("loadAdsWithVMAPXml");
+      return this.loadAdsWithVMAPXml(xml);
+    } else {
+      console.log("loadAdsWithVASTXml");
+      return this.loadAdsWithVASTXml(xml);
+    }
+  }
+
+  /**
+   *
+   * @param {XMLDocument|string} xml
+   */
+  loadAdsWithVMAPXml(xml) {
+    return;
   }
 
   /**
