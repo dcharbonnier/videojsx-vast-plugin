@@ -41,6 +41,7 @@ export class AdLoader {
    * @param {XMLDocument|string} xml
    */
   loadAdsWithXml(xml) {
+    console.log("loadAdsWithXml");
     return new Promise((accept, reject) => {
       let xmlDocument;
 
