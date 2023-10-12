@@ -13,10 +13,11 @@ export class AdLoader {
    *
    * @param {VASTClient} vastClient
    * @param {VASTParser} vastParser
+   * @param {any} vmap
    * @param {AdSelector} adSelector
    * @param {object} options
    */
-  constructor(vastClient, vastParser, adSelector, options) {
+  constructor(vastClient, vastParser, vmap, adSelector, options) {
     this.#vastClient = vastClient;
     this.#vastParser = vastParser;
     this.#adSelector = adSelector;
