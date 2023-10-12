@@ -56,9 +56,16 @@ export class AdLoader {
    * @param {XMLDocument|string} xml
    */
   loadAdsWithVMAPXml(xml) {
-    console.log("vmap: ");
-    const vmap = new VMAP(xml);
-    console.log("vmap: ", vmap);
+    let xmlDocument;
+
+    if (xml.constructor === window.XMLDocument) {
+      xmlDocument = xml;
+    } else if (xml.constructor === String) {
+      xmlDocument = new window.DOMParser().parseFromString(xml, "text/xml");
+    } else {
+      throw new Error("xml config option must be a String or XMLDocument");
+    }
+    console.log("xmlDocument: ", xmlDocument);
   }
 
   /**
