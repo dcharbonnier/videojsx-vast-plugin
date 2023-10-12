@@ -56,6 +56,7 @@ export class AdLoader {
    * @param {XMLDocument|string} xml
    */
   loadAdsWithVMAPXml(xml) {
+    console.log("vmap: ");
     const vmap = new VMAP(xml);
     console.log("vmap: ", vmap);
   }
