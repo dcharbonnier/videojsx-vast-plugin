@@ -5,7 +5,6 @@ import { TrackedAd } from "./tracked-ad";
 
 export class AdLoader {
   #vastClient;
-  #vmap;
   #vastParser;
   #options;
   #adSelector;
@@ -14,14 +13,12 @@ export class AdLoader {
    *
    * @param {VASTClient} vastClient
    * @param {VASTParser} vastParser
-   * @param vmap
    * @param {AdSelector} adSelector
    * @param {object} options
    */
-  constructor(vastClient, vastParser, vmap, adSelector, options) {
+  constructor(vastClient, vastParser, adSelector, options) {
     this.#vastClient = vastClient;
     this.#vastParser = vastParser;
-    this.#vmap = vmap;
     this.#adSelector = adSelector;
     this.#options = options;
   }
@@ -58,7 +55,7 @@ export class AdLoader {
    * @param {XMLDocument|string} xml
    */
   loadAdsWithVMAPXml(xml) {
-    console.log("vmap: ", this.#vmap);
+    console.log("vmap: ");
   }
 
   /**

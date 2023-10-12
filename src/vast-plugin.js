@@ -94,7 +94,6 @@ export class VastPlugin extends Plugin {
     const adLoader = new AdLoader(
       vastClient,
       new VASTParser(),
-      new VMAP(),
       new AdSelector(),
       options
     );
