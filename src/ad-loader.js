@@ -8,19 +8,22 @@ export class AdLoader {
   #vastClient;
   #vastParser;
   #options;
-  #adSelector;
+  #adVastSelector;
+  #adVmapSelector;
 
   /**
    *
    * @param {VASTClient} vastClient
    * @param {VASTParser} vastParser
-   * @param {AdSelector} adSelector
+   * @param {AdVastSelector} adVastSelector
+   * @param {AdVmapSelector} adVmapSelector
    * @param {object} options
    */
-  constructor(vastClient, vastParser, adSelector, options) {
+  constructor(vastClient, vastParser, adVastSelector, adVmapSelector, options) {
     this.#vastClient = vastClient;
     this.#vastParser = vastParser;
-    this.#adSelector = adSelector;
+    this.#adVastSelector = adVastSelector;
+    this.#adVmapSelector = adVmapSelector;
     this.#options = options;
   }
 
@@ -94,7 +97,7 @@ export class AdLoader {
 
       this.#vastParser
         .parseVAST(xmlDocument)
-        .then(this.#adSelector.selectAds)
+        .then(this.#adVastSelector.selectAds)
         .then(this.#createTrackedAds)
         .then(accept)
         .catch(reject);
@@ -108,7 +111,7 @@ export class AdLoader {
           withCredentials: this.#options.withCredentials,
           wrapperLimit: this.#options.wrapperLimit,
         })
-        .then(this.#adSelector.selectAds)
+        .then(this.#adVastSelector.selectAds)
         .then(this.#createTrackedAds)
         .then(accept)
         .catch(reject);
