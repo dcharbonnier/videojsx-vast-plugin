@@ -66,7 +66,10 @@ export class AdLoader {
       throw new Error("xml config option must be a String or XMLDocument");
     }
     try {
+      console.log("Trying to parse VMAP");
       const vmap = new VMAP(xmlDocument);
+      console.log("VMAP parsed");
+      console.log(vmap);
       resolve(vmap);
     } catch (error) {
       reject(new Error("Failed to parse VMAP: " + error.message));
