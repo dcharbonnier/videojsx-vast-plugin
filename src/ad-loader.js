@@ -65,7 +65,12 @@ export class AdLoader {
     } else {
       throw new Error("xml config option must be a String or XMLDocument");
     }
-    console.log("xmlDocument: ", xmlDocument);
+    try {
+      const vmap = new VMAP(xmlDocument);
+      resolve(vmap);
+    } catch (error) {
+      reject(new Error("Failed to parse VMAP: " + error.message));
+    }
   }
 
   /**
