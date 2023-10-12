@@ -1,12 +1,12 @@
-import videojs from 'video.js';
-import {VASTClient, VASTParser} from '@dailymotion/vast-client';
-import document from 'global/document';
-import {UI} from './ui';
-import {AdLoader} from './ad-loader';
-import {AdSelector} from './ad-selector';
-import {VPAIDHandler} from './vpaid-handler';
-import {createVASTContext} from "./event";
-const Plugin = videojs.getPlugin('plugin');
+import videojs from "video.js";
+import { VASTClient, VASTParser } from "@dailymotion/vast-client";
+import document from "global/document";
+import { UI } from "./ui";
+import { AdLoader } from "./ad-loader";
+import { AdSelector } from "./ad-selector";
+import { VPAIDHandler } from "./vpaid-handler";
+import { createVASTContext } from "./event";
+const Plugin = videojs.getPlugin("plugin");
 
 const DEFAULT_OPTIONS = Object.freeze({
   seekEnabled: false,
@@ -14,25 +14,24 @@ const DEFAULT_OPTIONS = Object.freeze({
   wrapperLimit: 10,
   withCredentials: true,
   skip: 0,
-  skipLabel: 'Skip',
-  skipCountDownLabel: 'Skip in {time_left}...',
+  skipLabel: "Skip",
+  skipCountDownLabel: "Skip in {time_left}...",
   vpaid: {
     containerId: undefined,
-    containerClass: 'vjs-vpaid-container',
-    videoInstance: 'none'
+    containerClass: "vjs-vpaid-container",
+    videoInstance: "none",
   },
   companion: {
     elementId: null,
     maxWidth: 0,
-    maxHeight: 0
-  }
+    maxHeight: 0,
+  },
 });
 
 /**
  * VastPlugin
  */
 export class VastPlugin extends Plugin {
-
   /**
    * Constructor
    *
@@ -42,8 +41,8 @@ export class VastPlugin extends Plugin {
   constructor(player, options) {
     super(player);
     // Could be initialized already by user
-    if (typeof player.ads === 'function') {
-      player.ads({debug: false, liveCuePoints: false});
+    if (typeof player.ads === "function") {
+      player.ads({ debug: false, liveCuePoints: false });
     }
 
     console.log(`videojsx-vast-plugin running`);
@@ -65,51 +64,56 @@ export class VastPlugin extends Plugin {
 
     const autoplay = player.autoplay();
 
-    player.on('adtimeout', () => {
+    player.on("adtimeout", () => {
       timedOut = true;
     });
 
     const ui = new UI(player, options);
 
-    function skip () {
+    function skip() {
       if (currentAd?.hasVideoMedia()) {
         currentAd.linearAdTracker.skip();
         player.trigger({
-          type: 'vast.skipAd',
-          vast: createVASTContext(currentAd.linearAdTracker)
+          type: "vast.skipAd",
+          vast: createVASTContext(currentAd.linearAdTracker),
         });
         playNextAd();
       }
     }
 
-    ui.on('skip', skip);
-    ui.on('click', () => {
+    ui.on("skip", skip);
+    ui.on("click", () => {
       currentAd.linearAdTracker.click();
     });
 
-    player.on('readyforpreroll', () => {
+    player.on("readyforpreroll", () => {
       startPreRoll();
     });
 
-    const adLoader = new AdLoader(vastClient, new VASTParser(), new AdSelector(), options);
-    adLoader.loadAds()
-      .then(trackedAds => {
+    const adLoader = new AdLoader(
+      vastClient,
+      new VASTParser(),
+      new AdSelector(),
+      options
+    );
+    adLoader
+      .loadAds()
+      .then((trackedAds) => {
         // TODO: document this timeout
         if (!timedOut) {
           ads.push(...trackedAds);
           currentAd = null;
-          player.trigger('adsready');
-        }
-        else {
+          player.trigger("adsready");
+        } else {
           // avoid interrupting content playback
           // TODO: option to allow this interruption
-          throw new Error('Ad load took too long.');
+          throw new Error("Ad load took too long.");
         }
       })
-      .catch(err => {
+      .catch((err) => {
         // eslint-disable-next-line no-console
         console.log(`Ad cancelled: ${err.message}`);
-        player.trigger('nopreroll');
+        player.trigger("nopreroll");
       })
       .finally(() => {
         if (autoplay) {
@@ -125,9 +129,12 @@ export class VastPlugin extends Plugin {
      */
     const createSourceObjects = (mediaFiles) => {
       return mediaFiles
-        .filter(mediaFile => mediaFile.apiFramework == null)
-        .map(mediaFile => ({type: mediaFile.mimeType, src: mediaFile.fileURL}));
-    }
+        .filter((mediaFile) => mediaFile.apiFramework == null)
+        .map((mediaFile) => ({
+          type: mediaFile.mimeType,
+          src: mediaFile.fileURL,
+        }));
+    };
 
     const playNextAd = () => {
       const nextAd = ads[currentAdIndex + 1];
@@ -151,19 +158,20 @@ export class VastPlugin extends Plugin {
         if (currentAd.hasVideoMedia()) {
           const allMediaFiles = currentAd.linearCreative.mediaFiles;
 
-          const streamingMediaFiles = allMediaFiles
-            .filter(mediaFile => mediaFile.deliveryType === 'streaming')
+          const streamingMediaFiles = allMediaFiles.filter(
+            (mediaFile) => mediaFile.deliveryType === "streaming"
+          );
 
-          const nonStreamingMediaFiles = allMediaFiles
-            .filter(mediaFile => mediaFile.deliveryType !== 'streaming');
+          const nonStreamingMediaFiles = allMediaFiles.filter(
+            (mediaFile) => mediaFile.deliveryType !== "streaming"
+          );
 
           if (nonStreamingMediaFiles.length > 0) {
             player.src(createSourceObjects(nonStreamingMediaFiles));
-          }
-          else if (streamingMediaFiles.length > 0) {
+          } else if (streamingMediaFiles.length > 0) {
             let assetDuration = currentAd.linearAdTracker.assetDuration;
             if (assetDuration == null || assetDuration < 1) {
-              console.log('Streaming ads must have a duration');
+              console.log("Streaming ads must have a duration");
               playNextAd();
               return;
             }
@@ -172,11 +180,12 @@ export class VastPlugin extends Plugin {
           }
           ui.duration = currentAd.linearAdTracker.assetDuration || 0;
         } else {
-          vpaidHandler.handle(currentAd.linearAdTracker)
+          vpaidHandler
+            .handle(currentAd.linearAdTracker)
             .then(() => {
               playNextAd();
             })
-            .catch(err => {
+            .catch((err) => {
               console.log(err);
               playNextAd();
             });
@@ -187,9 +196,9 @@ export class VastPlugin extends Plugin {
         currentAdIndex = -1;
         endPreRoll();
       }
-    }
+    };
 
-    const {setUpEvents, tearDownEvents} = (() => {
+    const { setUpEvents, tearDownEvents } = (() => {
       const adPlayFn = () => {
         if (currentAd.skipAfterDuration) {
           const ad = currentAd;
@@ -203,8 +212,8 @@ export class VastPlugin extends Plugin {
         if (!currentAd.linearAdTracker.impressed && currentAd.hasVideoMedia()) {
           currentAd.linearAdTracker.trackImpression();
           player.trigger({
-            type: 'vast.adStart',
-            vast: createVASTContext(currentAd.linearAdTracker)
+            type: "vast.adStart",
+            vast: createVASTContext(currentAd.linearAdTracker),
           });
         }
       };
@@ -221,7 +230,7 @@ export class VastPlugin extends Plugin {
       const pauseFn = () => {
         if (player.remainingTime() > 0) {
           currentAd.linearAdTracker.setPaused(true);
-          player.one('adplay', () => {
+          player.one("adplay", () => {
             currentAd.linearAdTracker.setPaused(false);
           });
         }
@@ -230,7 +239,9 @@ export class VastPlugin extends Plugin {
       // args: err
       const adErrorFn = () => {
         const MEDIAFILE_PLAYBACK_ERROR = 405;
-        currentAd.linearAdTracker.error({ERRORCODE: MEDIAFILE_PLAYBACK_ERROR});
+        currentAd.linearAdTracker.error({
+          ERRORCODE: MEDIAFILE_PLAYBACK_ERROR,
+        });
         // Do not want to show VAST related errors to the user
         player.error(null);
         playNextAd();
@@ -269,8 +280,8 @@ export class VastPlugin extends Plugin {
         if (currentAd.hasVideoMedia()) {
           currentAd.linearAdTracker.complete();
           player.trigger({
-            type: 'vast.adEnd',
-            vast: createVASTContext(currentAd.linearAdTracker)
+            type: "vast.adEnd",
+            vast: createVASTContext(currentAd.linearAdTracker),
           });
           playNextAd();
         }
@@ -278,24 +289,24 @@ export class VastPlugin extends Plugin {
 
       return {
         setUpEvents: () => {
-          player.on('adended', adEndedFn);
-          player.on('adplay', adPlayFn);
-          player.on('adtimeupdate', timeupdateFn);
-          player.on('adpause', pauseFn);
-          player.on('aderror', adErrorFn);
-          player.on('advolumechange', muteFn);
-          player.on('fullscreenchange', fullScreenFn);
+          player.on("adended", adEndedFn);
+          player.on("adplay", adPlayFn);
+          player.on("adtimeupdate", timeupdateFn);
+          player.on("adpause", pauseFn);
+          player.on("aderror", adErrorFn);
+          player.on("advolumechange", muteFn);
+          player.on("fullscreenchange", fullScreenFn);
         },
         tearDownEvents: () => {
-          player.off('adended', adEndedFn);
-          player.off('adplay', adPlayFn);
-          player.off('adtimeupdate', timeupdateFn);
-          player.off('adpause', pauseFn);
-          player.off('aderror', adErrorFn);
-          player.off('advolumechange', muteFn);
-          player.off('fullscreenchange', fullScreenFn);
-        }
-      }
+          player.off("adended", adEndedFn);
+          player.off("adplay", adPlayFn);
+          player.off("adtimeupdate", timeupdateFn);
+          player.off("adpause", pauseFn);
+          player.off("aderror", adErrorFn);
+          player.off("advolumechange", muteFn);
+          player.off("fullscreenchange", fullScreenFn);
+        },
+      };
     })();
 
     const showCompanionAd = () => {
@@ -309,45 +320,45 @@ export class VastPlugin extends Plugin {
           companionTracker.click();
         };
 
-        const hyperLink = document.createElement('a');
+        const hyperLink = document.createElement("a");
 
-        hyperLink.src = '#';
-        hyperLink.addEventListener('click', onClick);
+        hyperLink.src = "#";
+        hyperLink.addEventListener("click", onClick);
 
-        const image = document.createElement('img');
+        const image = document.createElement("img");
 
         image.src = variation.staticResource;
 
         hyperLink.appendChild(image);
 
-        dest.innerHTML = '';
+        dest.innerHTML = "";
         dest.appendChild(hyperLink);
       } else if (dest) {
         // TODO: option to remove last companion ad when content plays?
-        dest.innerHTML = '';
+        dest.innerHTML = "";
       }
-    }
+    };
 
     const startPreRoll = () => {
       console.log(`Playing ${ads.length} ads`);
       player.ads.startLinearAdMode();
       setUpEvents();
       playNextAd();
-    }
+    };
 
     const endPreRoll = () => {
       player.ads.endLinearAdMode();
       tearDownEvents();
-      console.log('Playing content');
-    }
+      console.log("Playing content");
+    };
   }
 }
 
-videojs.registerPlugin('vast', VastPlugin);
+videojs.registerPlugin("vast", VastPlugin);
 
 /**
-  * @param {CustomVideoJsPlayer} player
-  * @param {Record<string, any>} options
+ * @param {CustomVideoJsPlayer} player
+ * @param {Record<string, any>} options
  */
 const onPlayerReady = (player, options) => {
   player.vast = new VastPlugin(player, options);
