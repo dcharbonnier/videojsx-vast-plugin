@@ -1,6 +1,5 @@
 import videojs from "video.js";
 import { VASTClient, VASTParser } from "@dailymotion/vast-client";
-import VMAP from "@dailymotion/vmap";
 import document from "global/document";
 import { UI } from "./ui";
 import { AdLoader } from "./ad-loader";
@@ -94,7 +93,6 @@ export class VastPlugin extends Plugin {
     const adLoader = new AdLoader(
       vastClient,
       new VASTParser(),
-      "",
       new AdSelector(),
       options
     );

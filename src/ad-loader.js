@@ -1,6 +1,7 @@
 import window from "global";
 import { companionFn, linearFn, isVmap } from "./utils";
 import { VASTClient, VASTParser, VASTTracker } from "@dailymotion/vast-client";
+import VMAP from "@dailymotion/vmap";
 import { TrackedAd } from "./tracked-ad";
 
 export class AdLoader {
@@ -13,11 +14,10 @@ export class AdLoader {
    *
    * @param {VASTClient} vastClient
    * @param {VASTParser} vastParser
-   * @param {any} vmap
    * @param {AdSelector} adSelector
    * @param {object} options
    */
-  constructor(vastClient, vastParser, vmap, adSelector, options) {
+  constructor(vastClient, vastParser, adSelector, options) {
     this.#vastClient = vastClient;
     this.#vastParser = vastParser;
     this.#adSelector = adSelector;
