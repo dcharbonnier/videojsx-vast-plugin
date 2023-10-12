@@ -1,12 +1,12 @@
 import window from "global";
-import {companionFn, linearFn} from "./utils";
-import {VASTClient, VASTParser, VASTTracker} from '@dailymotion/vast-client';
-import {TrackedAd} from "./tracked-ad";
+import { companionFn, linearFn } from "./utils";
+import { VASTClient, VASTParser, VASTTracker } from "@dailymotion/vast-client";
+import { TrackedAd } from "./tracked-ad";
 
 export class AdLoader {
-  #vastClient
-  #vastParser
-  #options
+  #vastClient;
+  #vastParser;
+  #options;
   #adSelector;
 
   /**
@@ -25,10 +25,10 @@ export class AdLoader {
 
   loadAds() {
     return new Promise((accept, reject) => {
-      const {url, xml} = this.#options;
+      const { url, xml } = this.#options;
 
       if (!url && !xml) {
-        throw new Error('xml or url option must be set');
+        throw new Error("xml or url option must be set");
       }
 
       const ads = url ? this.loadAdsWithUrl(url) : this.loadAdsWithXml(xml);
@@ -47,9 +47,9 @@ export class AdLoader {
       if (xml.constructor === window.XMLDocument) {
         xmlDocument = xml;
       } else if (xml.constructor === String) {
-        xmlDocument = (new window.DOMParser()).parseFromString(xml, 'text/xml');
+        xmlDocument = new window.DOMParser().parseFromString(xml, "text/xml");
       } else {
-        throw new Error('xml config option must be a String or XMLDocument');
+        throw new Error("xml config option must be a String or XMLDocument");
       }
 
       this.#vastParser
@@ -58,7 +58,7 @@ export class AdLoader {
         .then(this.#createTrackedAds)
         .then(accept)
         .catch(reject);
-    })
+    });
   }
 
   loadAdsWithUrl(url) {
@@ -66,23 +66,27 @@ export class AdLoader {
       this.#vastClient
         .get(url, {
           withCredentials: this.#options.withCredentials,
-          wrapperLimit: this.#options.wrapperLimit
+          wrapperLimit: this.#options.wrapperLimit,
         })
         .then(this.#adSelector.selectAds)
         .then(this.#createTrackedAds)
         .then(accept)
         .catch(reject);
-    })
+    });
   }
 
   /*** private methods ***/
 
-  #createTrackedAds = ads => {
-    const createTrackedAd = ad => {
-      const linearAdTracker =
-        new VASTTracker(this.#vastClient, ad, ad.creatives.find(linearFn), ad.creatives.find(companionFn));
+  #createTrackedAds = (ads) => {
+    const createTrackedAd = (ad) => {
+      const linearAdTracker = new VASTTracker(
+        this.#vastClient,
+        ad,
+        ad.creatives.find(linearFn),
+        ad.creatives.find(companionFn)
+      );
 
-      linearAdTracker.on('clickthrough', onClickThrough);
+      linearAdTracker.on("clickthrough", onClickThrough);
 
       let companionAdTracker = null;
 
@@ -92,23 +96,32 @@ export class AdLoader {
         // Just pick the first suitable companion ad for now
         const options = this.#options;
         const variation = companionCreative.variations
-          .filter(v => v.staticResource)
-          .filter(v => v.type.indexOf('image') === 0)
-          .find(v => parseInt(v.width, 10) <= options.companion.maxWidth && parseInt(v.height, 10) <= options.companion.maxHeight);
+          .filter((v) => v.staticResource)
+          .filter((v) => v.type.indexOf("image") === 0)
+          .find(
+            (v) =>
+              parseInt(v.width, 10) <= options.companion.maxWidth &&
+              parseInt(v.height, 10) <= options.companion.maxHeight
+          );
 
         if (variation) {
-          companionAdTracker = new VASTTracker(this.#vastClient, ad, companionCreative, variation);
-          companionAdTracker.on('clickthrough', onClickThrough);
+          companionAdTracker = new VASTTracker(
+            this.#vastClient,
+            ad,
+            companionCreative,
+            variation
+          );
+          companionAdTracker.on("clickthrough", onClickThrough);
         }
       }
 
       return new TrackedAd(linearAdTracker, companionAdTracker);
-    }
+    };
 
     return ads.map(createTrackedAd);
-  }
+  };
 }
 
 function onClickThrough(url) {
-  window.open(url, '_blank');
+  window.open(url, "_blank");
 }
