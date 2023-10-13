@@ -7,8 +7,9 @@ export class AdVmapSelector {
    * @return {object[]}
    */
   selectAds(vmapResponse) {
+    console.log("vmapResponse", vmapResponse);
     if (!vmapResponse.ads || vmapResponse.ads.length === 0) {
-      throw new Error("no ads found in VAST");
+      throw new Error("no ads found in vmap");
     }
 
     const adsWithLinear = vmapResponse.ads.filter((ad) =>

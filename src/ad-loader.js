@@ -59,24 +59,23 @@ export class AdLoader {
    * @param {XMLDocument|string} xml
    */
   loadAdsWithVMAPXml(xml) {
-    let xmlDocument;
+    return new Promise((accept, reject) => {
+      let xmlDocument;
 
-    if (xml.constructor === window.XMLDocument) {
-      xmlDocument = xml;
-    } else if (xml.constructor === String) {
-      xmlDocument = new window.DOMParser().parseFromString(xml, "text/xml");
-    } else {
-      throw new Error("xml config option must be a String or XMLDocument");
-    }
-    try {
-      console.log("Trying to parse VMAP");
-      const vmap = new VMAP(xmlDocument);
-      console.log("VMAP parsed");
-      console.log(vmap);
-      resolve(vmap);
-    } catch (error) {
-      reject(new Error("Failed to parse VMAP: " + error.message));
-    }
+      if (xml.constructor === window.XMLDocument) {
+        xmlDocument = xml;
+      } else if (xml.constructor === String) {
+        xmlDocument = new window.DOMParser().parseFromString(xml, "text/xml");
+      } else {
+        throw new Error("xml config option must be a String or XMLDocument");
+      }
+      try {
+        const vmap = new VMAP(xmlDocument);
+        resolve(this.#adVmapSelector.selectAds(vmap));
+      } catch (error) {
+        reject(new Error("Failed to parse VMAP: " + error.message));
+      }
+    });
   }
 
   /**
